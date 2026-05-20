@@ -4,12 +4,13 @@
     "homepage": "https://github.com/CnsMaple/Nvy",
     "license": "MIT",
     "bin": "Nvy.exe",
-    "url": "https://github.com/CnsMaple/Nvy/releases/download/0.4.2-dev/Nvy.exe",
+    "url": "https://github.com/CnsMaple/Nvy/releases/download/v0.4.2-dev/Nvy.exe",
     "hash": "",
     "checkver": {
-        "github": "https://github.com/CnsMaple/Nvy"
+        "url": "https://github.com/CnsMaple/Nvy/releases",
+        "re": "v([\\d.]+-[a-f0-9]+)/Nvy\\.exe"
     },
     "autoupdate": {
-        "url": "https://github.com/CnsMaple/Nvy/releases/download/$version/Nvy.exe"
+        "url": "https://github.com/CnsMaple/Nvy/releases/download/v$version/Nvy.exe"
     }
 }

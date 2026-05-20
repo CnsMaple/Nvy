@@ -3,9 +3,9 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: "Release tag (e.g. v0.4.2-dev)"
-        required: true
+      version_suffix:
+        description: "Version suffix (default: auto from commit)"
+        required: false
         type: string
 
 jobs:
@@ -13,6 +13,17 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Generate version
+        id: version
+        shell: bash
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          if [ -z "${{ inputs.version_suffix }}" ]; then
+            echo "tag=v0.4.2-$SHA" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v0.4.2-${{ inputs.version_suffix }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -26,7 +37,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag }}
-          name: Release ${{ inputs.tag }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.tag }}
           files: build\Release\Nvy.exe
           generate_release_notes: true
