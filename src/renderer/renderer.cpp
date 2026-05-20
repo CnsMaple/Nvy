@@ -835,10 +835,11 @@ void UpdateImePos(Renderer* renderer) {
 	if (!input_context) return;
 
 	// Use a wide area so the IME composition window won't wrap
+	LONG right = x + (renderer->grid_cols - renderer->cursor.col) * static_cast<LONG>(renderer->font_width);
 	COMPOSITIONFORM cf {
 		.dwStyle = CFS_RECT,
 		.ptCurrentPos = { x, y },
-		.rcArea = { x, y, x + 8000, y + static_cast<LONG>(renderer->font_height) }
+		.rcArea = { x, y, right, y + static_cast<LONG>(renderer->font_height) }
 	};
 	ImmSetCompositionWindow(input_context, &cf);
 
