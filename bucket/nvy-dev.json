@@ -8,9 +8,9 @@
     "hash": "",
     "checkver": {
         "url": "https://github.com/CnsMaple/Nvy/releases",
-        "re": "v([\\d.]+-[a-f0-9]+)/Nvy\\.exe"
+        "re": "v([\\d.]+)-dev/Nvy\\.exe"
     },
     "autoupdate": {
-        "url": "https://github.com/CnsMaple/Nvy/releases/download/v$version/Nvy.exe"
+        "url": "https://github.com/CnsMaple/Nvy/releases/download/v$version-dev/Nvy.exe"
     }
 }

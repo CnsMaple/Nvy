@@ -1,12 +1,7 @@
-name: Build
+name: Build dev
 
 on:
   workflow_dispatch:
-    inputs:
-      version_suffix:
-        description: "Version suffix (default: auto from commit)"
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -16,17 +11,16 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Generate version
+      - name: Get base version
         id: version
         shell: bash
         run: |
-          SHA=$(git rev-parse --short HEAD)
-          if [ -z "${{ inputs.version_suffix }}" ]; then
-            echo "tag=v0.4.2-$SHA" >> $GITHUB_OUTPUT
-          else
-            echo "tag=v0.4.2-${{ inputs.version_suffix }}" >> $GITHUB_OUTPUT
-          fi
+          BASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.4.0")
+          echo "tag=${BASE}-dev" >> $GITHUB_OUTPUT
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -43,5 +37,7 @@ jobs:
           tag: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.tag }}
           artifacts: build\Release\Nvy.exe
-          generateReleaseNotes: true
+          allowUpdates: true
+          removeArtifacts: true
+          replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
