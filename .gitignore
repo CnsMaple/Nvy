@@ -1,4 +1,5 @@
 .cache/
 .clangd/
 build/
+build_vs/
 compile_commands.json

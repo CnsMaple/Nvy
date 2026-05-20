@@ -828,22 +828,34 @@ void UpdateCursorPos(Renderer *renderer, mpack_node_t cursor_goto) {
 }
 
 void UpdateImePos(Renderer* renderer) {
-	HIMC input_context = ImmGetContext(renderer->hwnd);
-	COMPOSITIONFORM composition_form {
-		.dwStyle = CFS_POINT,
-		.ptCurrentPos = {
-			.x = static_cast<LONG>(renderer->cursor.col * renderer->font_width),
-			.y = static_cast<LONG>(renderer->cursor.row * renderer->font_height)
-		}
-	};
+	LONG x = static_cast<LONG>(renderer->cursor.col * renderer->font_width);
+	LONG y = static_cast<LONG>(renderer->cursor.row * renderer->font_height);
 
-	if (ImmSetCompositionWindow(input_context, &composition_form)) {
-		LOGFONTW font_attribs {
-			.lfHeight = static_cast<LONG>(renderer->font_height)
-		};
-		wcscpy_s(font_attribs.lfFaceName, LF_FACESIZE, renderer->font);
-		ImmSetCompositionFontW(input_context, &font_attribs);
-	}
+	HIMC input_context = ImmGetContext(renderer->hwnd);
+	if (!input_context) return;
+
+	// Use a wide area so the IME composition window won't wrap
+	LONG right = x + (renderer->grid_cols - renderer->cursor.col) * static_cast<LONG>(renderer->font_width);
+	COMPOSITIONFORM cf {
+		.dwStyle = CFS_RECT,
+		.ptCurrentPos = { x, y },
+		.rcArea = { x, y, right, y + static_cast<LONG>(renderer->font_height) }
+	};
+	ImmSetCompositionWindow(input_context, &cf);
+
+	// Exclude cursor area so IME places its candidate window below
+	CANDIDATEFORM cdf {
+		.dwStyle = CFS_EXCLUDE,
+		.ptCurrentPos = { x, y },
+		.rcArea = { x, y, x + static_cast<LONG>(renderer->font_width), y + static_cast<LONG>(renderer->font_height) }
+	};
+	ImmSetCandidateWindow(input_context, &cdf);
+
+	LOGFONTW lf {
+		.lfHeight = static_cast<LONG>(renderer->font_height)
+	};
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, renderer->font);
+	ImmSetCompositionFontW(input_context, &lf);
 
 	ImmReleaseContext(renderer->hwnd, input_context);
 }
@@ -1196,6 +1208,7 @@ void RendererRedraw(Renderer *renderer, mpack_node_t params, bool start_maximize
 				ShowWindow(renderer->hwnd, start_maximized ? SW_MAXIMIZE : SW_SHOWDEFAULT);			}
 
 			RendererFlush(renderer);
+			UpdateImePos(renderer);
 		}
 	}
 }

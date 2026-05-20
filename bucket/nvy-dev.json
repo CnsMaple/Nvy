@@ -1,0 +1,16 @@
+{
+    "version": "0.4.2-dev",
+    "description": "Nvy - Neovim client (IME fix dev branch)",
+    "homepage": "https://github.com/CnsMaple/Nvy",
+    "license": "MIT",
+    "bin": "Nvy.exe",
+    "url": "https://github.com/CnsMaple/Nvy/releases/download/v0.4.2-dev/Nvy.exe",
+    "hash": "",
+    "checkver": {
+        "url": "https://github.com/CnsMaple/Nvy/releases",
+        "re": "v([\\d.]+)-dev/Nvy\\.exe"
+    },
+    "autoupdate": {
+        "url": "https://github.com/CnsMaple/Nvy/releases/download/v$version-dev/Nvy.exe"
+    }
+}
